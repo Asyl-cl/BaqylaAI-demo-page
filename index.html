@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BAQYLA AI — ИИ-финдиректор для малого бизнеса</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              900: '#064e3b',
+              accent: '#10b981',
+              neon: '#00ff9d',
+              darkBg: '#090d16',
+              cardBg: '#111827',
+              border: '#1f2937'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      background-color: #090d16;
+      color: #f3f4f6;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Custom Glassmorphism Effect */
+    .glass-card {
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .glass-card-hover {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card-hover:hover {
+      border-color: rgba(16, 185, 129, 0.4);
+      box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.15);
+      transform: translateY(-2px);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090d16;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1f2937;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #10b981;
+    }
+
+    .modal-backdrop {
+      background: rgba(4, 7, 13, 0.88);
+      backdrop-filter: blur(8px);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- ONBOARDING MODAL / SELECTION STEP -->
+  <div id="onboarding-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop transition-opacity duration-300">
+    <div class="glass-card max-w-2xl w-full rounded-3xl p-6 sm:p-8 border border-emerald-500/30 shadow-2xl relative overflow-hidden">
+      <div class="absolute -top-24 -right-24 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="text-center space-y-3 mb-6 relative z-10">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/20">
+          <i data-lucide="store" class="w-7 h-7 text-black font-bold"></i>
+        </div>
+        <span class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold uppercase tracking-wider">
+          Шаг 1 из 1 • Выбор Ниши
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Выберите тип вашего бизнеса</h2>
+        <p class="text-xs sm:text-sm text-gray-300 max-w-md mx-auto">
+          BAQYLA AI загрузит специализированный демо-стенд аналитики, накладные и кассовые сценарии под вашу сферу.
+        </p>
+      </div>
+
+      <!-- Business Type Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6 relative z-10">
+        <button onclick="selectBusinessType('market')" class="p-4 rounded-2xl bg-gray-900/80 border border-gray-800 hover:border-emerald-500 hover:bg-emerald-500/5 text-left transition-all group flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+            <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors">Мини-маркет / Магазин</p>
+            <p class="text-[11px] text-gray-400 mt-0.5">Учёт накладных, замороженные остатки, просрочки товаров.</p>
+          </div>
+        </button>
+
+        <button onclick="selectBusinessType('cafe')" class="p-4 rounded-2xl bg-gray-900/80 border border-gray-800 hover:border-emerald-500 hover:bg-emerald-500/5 text-left transition-all group flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-teal-500/10 text-teal-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+            <i data-lucide="utensils" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors">Кафе / Общепит</p>
+            <p class="text-[11px] text-gray-400 mt-0.5">Маржа блюд, списания заготовок, расчеты с поставщиками мяса.</p>
+          </div>
+        </button>
+
+        <button onclick="selectBusinessType('factory')" class="p-4 rounded-2xl bg-gray-900/80 border border-gray-800 hover:border-emerald-500 hover:bg-emerald-500/5 text-left transition-all group flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+            <i data-lucide="factory" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors">Цех / Производство</p>
+            <p class="text-[11px] text-gray-400 mt-0.5">Контроль сырья, разрыв перед закупкой материалов, дебиторка опта.</p>
+          </div>
+        </button>
+
+        <button onclick="selectBusinessType('clothing')" class="p-4 rounded-2xl bg-gray-900/80 border border-gray-800 hover:border-emerald-500 hover:bg-emerald-500/5 text-left transition-all group flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+            <i data-lucide="shirt" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors">Магазин одежды / Ритейл</p>
+            <p class="text-[11px] text-gray-400 mt-0.5">Залежавшиеся коллекции, неходовые размеры, скидки и акции.</p>
+          </div>
+        </button>
+      </div>
+
+      <div class="text-center relative z-10 pt-2 border-t border-gray-800">
+        <p class="text-[11px] text-gray-500">Вы сможете легко переключить тип бизнеса в любой момент в верхнем меню</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP HEADER / NAVIGATION -->
+  <header class="sticky top-0 z-40 w-full border-b border-gray-800/80 glass-card bg-opacity-90">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 gap-2">
+        
+        <!-- Brand Logo -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <i data-lucide="brain-circuit" class="w-6 h-6 text-black font-bold"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xl font-extrabold tracking-tight text-white">BAQYLA<span class="text-emerald-400">.AI</span></span>
+              <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">2026 Live</span>
+            </div>
+            <p class="text-xs text-gray-400 hidden sm:block">ИИ-финдиректор для МСБ • Тараз</p>
+          </div>
+        </div>
+
+        <!-- Dynamic Header Business Switcher Selector -->
+        <div class="hidden lg:flex items-center gap-2 bg-gray-900/90 p-1.5 rounded-2xl border border-gray-800 text-xs">
+          <span class="text-gray-400 text-[11px] font-semibold px-2 uppercase tracking-wider">Сфера:</span>
+          <button id="biz-btn-market" onclick="selectBusinessType('market')" class="px-3 py-1.5 rounded-xl font-medium transition-all text-white bg-emerald-500/20 border border-emerald-500/40">
+            🛒 Мини-маркет
+          </button>
+          <button id="biz-btn-cafe" onclick="selectBusinessType('cafe')" class="px-3 py-1.5 rounded-xl font-medium text-gray-400 hover:text-white transition-all">
+            ☕ Кафе
+          </button>
+          <button id="biz-btn-factory" onclick="selectBusinessType('factory')" class="px-3 py-1.5 rounded-xl font-medium text-gray-400 hover:text-white transition-all">
+            🏭 Цех
+          </button>
+          <button id="biz-btn-clothing" onclick="selectBusinessType('clothing')" class="px-3 py-1.5 rounded-xl font-medium text-gray-400 hover:text-white transition-all">
+            👗 Ритейл
+          </button>
+        </div>
+
+        <!-- Desktop Navigation Tabs -->
+        <nav class="hidden md:flex items-center gap-1 bg-gray-900/80 p-1 rounded-xl border border-gray-800 text-xs">
+          <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-3 py-1.5 rounded-lg font-medium transition-all text-emerald-400 bg-emerald-500/10">
+            <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 inline mr-1"></i>Дашборд
+          </button>
+          <button onclick="switchTab('ocr')" id="tab-ocr" class="px-3 py-1.5 rounded-lg font-medium text-gray-400 hover:text-white transition-all">
+            <i data-lucide="file-text" class="w-3.5 h-3.5 inline mr-1"></i>Накладная
+          </button>
+          <button onclick="switchTab('debts')" id="tab-debts" class="px-3 py-1.5 rounded-lg font-medium text-gray-400 hover:text-white transition-all">
+            <i data-lucide="users" class="w-3.5 h-3.5 inline mr-1"></i>Должники
+          </button>
+          <button onclick="switchTab('arch')" id="tab-arch" class="px-3 py-1.5 rounded-lg font-medium text-gray-400 hover:text-white transition-all">
+            <i data-lucide="cpu" class="w-3.5 h-3.5 inline mr-1"></i>Архитектура
+          </button>
+        </nav>
+
+        <!-- CTA Action Buttons -->
+        <div class="flex items-center gap-2">
+          <button onclick="openOnboardingModal()" class="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium text-xs lg:hidden">
+            <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+          </button>
+          <a href="https://t.me/BaqylaAiBot" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-bold text-xs hover:from-emerald-400 hover:to-teal-400 transition-all shadow-md shadow-emerald-500/20">
+            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+            <span>@BaqylaAiBot</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MOBILE BUSINESS SWITCHER BAR -->
+  <div class="lg:hidden bg-gray-900 border-b border-gray-800 px-4 py-2 flex items-center justify-between overflow-x-auto text-xs gap-2">
+    <span class="text-gray-400 text-[10px] uppercase font-bold shrink-0">Ниша:</span>
+    <button onclick="selectBusinessType('market')" class="px-2.5 py-1 rounded-lg bg-gray-800 text-emerald-400 text-[11px] shrink-0 font-medium">🛒 Маркет</button>
+    <button onclick="selectBusinessType('cafe')" class="px-2.5 py-1 rounded-lg bg-gray-800 text-gray-300 text-[11px] shrink-0 font-medium">☕ Кафе</button>
+    <button onclick="selectBusinessType('factory')" class="px-2.5 py-1 rounded-lg bg-gray-800 text-gray-300 text-[11px] shrink-0 font-medium">🏭 Цех</button>
+    <button onclick="selectBusinessType('clothing')" class="px-2.5 py-1 rounded-lg bg-gray-800 text-gray-300 text-[11px] shrink-0 font-medium">👗 Одежда</button>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+
+    <!-- HERO BANNER WITH CURRENT ACTIVE BUSINESS SCENARIO -->
+    <section class="relative overflow-hidden rounded-3xl glass-card p-6 md:p-8 border border-emerald-500/20 bg-gradient-to-br from-emerald-950/20 via-gray-900 to-gray-950">
+      <div class="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+        <div class="max-w-2xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold mb-3">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+            Жамбылская область • Тараз • <span id="hero-biz-tag">Мини-маркет «Береке»</span>
+          </div>
+          <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+            Превращаем сырые данные в <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">конкретные действия</span>
+          </h1>
+          <p id="hero-biz-desc" class="mt-2 text-sm text-gray-300">
+            ИИ-финдиректор за секунды переводит ваши накладные и выписки в точную маржу, отслеживает замороженные остатки и предупреждает о кассовых разрывах в Telegram.
+          </p>
+        </div>
+
+        <!-- Quick Switch Info Badge -->
+        <div class="w-full lg:w-auto flex flex-row lg:flex-col gap-3 shrink-0">
+          <div class="flex-1 glass-card p-3 rounded-2xl border border-gray-800 text-center sm:text-left">
+            <p class="text-[11px] text-gray-400">Текущий сценарий ИИ</p>
+            <p id="hero-scenario-title" class="text-base font-bold text-emerald-400 mt-0.5">Мини-маркет «Береке»</p>
+            <p id="hero-scenario-sub" class="text-[10px] text-gray-500">765 738 ₸ заморожено в остатках</p>
+          </div>
+          <button onclick="openOnboardingModal()" class="flex-1 glass-card p-3 rounded-2xl border border-emerald-500/30 hover:border-emerald-400 text-center sm:text-left transition-all group">
+            <p class="text-[11px] text-gray-400">Сменить сферу бизнеса</p>
+            <p class="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors flex items-center gap-1 justify-center sm:justify-start mt-1">
+              <span>Сменить нишу</span> &rarr;
+            </p>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: DASHBOARD & METRICS -->
+    <div id="view-dashboard" class="space-y-6">
+      <!-- 4 KEY DYNAMIC FINANCIAL CARDS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Card 1: Frozen Capital -->
+        <div class="glass-card glass-card-hover p-5 rounded-2xl relative overflow-hidden">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Заморожено в остатках</span>
+            <div class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400">
+              <i data-lucide="package-search" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-3">
+            <p id="card-frozen-val" class="text-2xl font-black text-white">765 738 ₸</p>
+            <p id="card-frozen-sub" class="text-xs text-amber-400/90 mt-1 flex items-center gap-1">
+              <i data-lucide="clock" class="w-3 h-3"></i> Залежался товар (14-28 дней)
+            </p>
+          </div>
+          <div id="card-frozen-desc" class="mt-3 pt-3 border-t border-gray-800 text-xs text-gray-400">
+            Вложены деньги в позиции без динамики продаж.
+          </div>
+        </div>
+
+        <!-- Card 2: Losses / Negative Margin -->
+        <div class="glass-card glass-card-hover p-5 rounded-2xl relative overflow-hidden">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Убыточные позиции</span>
+            <div class="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-400">
+              <i data-lucide="trending-down" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-3">
+            <p id="card-loss-val" class="text-2xl font-black text-rose-400">481 018 ₸</p>
+            <p id="card-loss-sub" class="text-xs text-rose-400/90 mt-1 flex items-center gap-1">
+              <i data-lucide="alert-triangle" class="w-3 h-3"></i> Отрицательная маржа
+            </p>
+          </div>
+          <div id="card-loss-desc" class="mt-3 pt-3 border-t border-gray-800 text-xs text-gray-400">
+            Товары продаются ниже себестоимости.
+          </div>
+        </div>
+
+        <!-- Card 3: Recent Invoice -->
+        <div class="glass-card glass-card-hover p-5 rounded-2xl relative overflow-hidden">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Последняя накладная</span>
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+              <i data-lucide="file-check-2" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-3">
+            <p id="card-inv-val" class="text-2xl font-black text-white">379 900 ₸</p>
+            <p id="card-inv-sub" class="text-xs text-emerald-400 mt-1 flex items-center gap-1">
+              <i data-lucide="check-circle-2" class="w-3 h-3"></i> Накладная № 4871
+            </p>
+          </div>
+          <div id="card-inv-desc" class="mt-3 pt-3 border-t border-gray-800 text-xs text-gray-400">
+            Обработана и занесена в систему ИИ.
+          </div>
+        </div>
+
+        <!-- Card 4: Cash Gap Warning -->
+        <div class="glass-card glass-card-hover p-5 rounded-2xl relative overflow-hidden border-amber-500/30">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Кассовый разрыв</span>
+            <div class="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400">
+              <i data-lucide="shield-alert" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-3">
+            <p id="card-gap-val" class="text-2xl font-black text-orange-400">Через 12 дней</p>
+            <p id="card-gap-sub" class="text-xs text-orange-300 mt-1 flex items-center gap-1">
+              <i data-lucide="info" class="w-3 h-3"></i> Нехватка ~240 000 ₸
+            </p>
+          </div>
+          <div id="card-gap-desc" class="mt-3 pt-3 border-t border-gray-800 text-xs text-gray-400">
+            Прогноз зарплаты и расчетов с оптовиками.
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN CHART & ACTIONABLE ADVICE -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Financial & Stock Breakdown Chart (2 Cols) -->
+        <div class="lg:col-span-2 glass-card p-6 rounded-2xl border border-gray-800">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 id="chart-title" class="text-lg font-bold text-white flex items-center gap-2">
+                <i data-lucide="bar-chart-3" class="w-5 h-5 text-emerald-400"></i>
+                Анализ товарных запасов и маржинальности
+              </h3>
+              <p id="chart-sub" class="text-xs text-gray-400">Структура капитала в остатках мини-маркета «Береке»</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-medium">
+              ABC / XYZ Анализ
+            </span>
+          </div>
+          <div class="h-64 sm:h-80 w-full relative">
+            <canvas id="financialChart"></canvas>
+          </div>
+        </div>
+
+        <!-- AI Step Recommendations -->
+        <div class="glass-card p-6 rounded-2xl border border-gray-800 flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center gap-2 text-emerald-400 font-bold mb-3">
+              <i data-lucide="sparkles" class="w-5 h-5"></i>
+              <span>Главный шаг на сегодня</span>
+            </div>
+            <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 mb-4">
+              <p class="text-xs font-semibold text-emerald-300 uppercase tracking-wider mb-1">Рекомендация ИИ</p>
+              <p id="ai-main-rec" class="text-sm font-medium text-white">
+                Пересмотреть розничную цену на <span class="font-bold text-emerald-400">«Куриное филе 1 кг»</span> и остановить закупку <span class="font-bold text-amber-400">«Кефир 1%»</span>.
+              </p>
+            </div>
+
+            <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Оперативные задачи:</h4>
+            <ul id="ai-tasks-list" class="space-y-3 text-xs text-gray-300">
+              <!-- Dynamically populated via JS -->
+            </ul>
+          </div>
+
+          <button onclick="switchTab('debts')" class="w-full py-2.5 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-semibold text-xs border border-emerald-500/30 transition-all flex items-center justify-center gap-2">
+            <span>Перейти к работе с должниками</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: INVOICE & OCR DEMO -->
+    <div id="view-ocr" class="hidden space-y-6">
+      <div class="glass-card p-6 rounded-2xl border border-gray-800">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i data-lucide="file-text" class="w-6 h-6 text-emerald-400"></i>
+              Распознавание документов и накладных
+            </h2>
+            <p id="ocr-desc" class="text-xs text-gray-400 mt-0.5">
+              Фото накладной или Excel преобразуются в точные данные с проверкой ИИ.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold flex items-center gap-1.5">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Точность ИИ: 99.4%
+            </span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Left: Document Details Header Info -->
+          <div class="lg:col-span-4 space-y-4">
+            <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800 space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-gray-800">
+                <span class="text-xs font-semibold text-gray-400">НАКЛАДНАЯ №</span>
+                <span id="ocr-doc-no" class="text-sm font-bold text-white">4871 от 17.10.2026</span>
+              </div>
+              <div>
+                <p class="text-[11px] text-gray-400 uppercase">Поставщик</p>
+                <p id="ocr-supplier" class="text-xs font-semibold text-emerald-400">ТОО «Оптовая база №7» (г. Тараз)</p>
+                <p class="text-[10px] text-gray-500">БИН: 000000000000</p>
+              </div>
+              <div>
+                <p class="text-[11px] text-gray-400 uppercase">Получатель</p>
+                <p id="ocr-receiver" class="text-xs font-semibold text-white">Мини-маркет «Береке» (г. Тараз)</p>
+              </div>
+              <div>
+                <p class="text-[11px] text-gray-400 uppercase">Основание</p>
+                <p id="ocr-contract" class="text-xs text-gray-300">Договор поставки № 15 от 01.03.2026</p>
+              </div>
+              <div>
+                <p class="text-[11px] text-gray-400 uppercase">Валюта</p>
+                <p class="text-xs text-gray-300">Тенге (₸)</p>
+              </div>
+            </div>
+
+            <!-- Upload Interactive Box Simulation -->
+            <div class="p-4 border-2 border-dashed border-gray-700 hover:border-emerald-500/50 rounded-xl bg-gray-900/40 text-center transition-all cursor-pointer">
+              <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-emerald-400 mb-2"></i>
+              <p class="text-xs font-semibold text-white">Загрузить свою накладную</p>
+              <p class="text-[10px] text-gray-400 mt-1">Поддерживаются JPG, PNG, PDF, Excel (.xlsx)</p>
+            </div>
+          </div>
+
+          <!-- Right: Document Table Data -->
+          <div class="lg:col-span-8 overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-gray-900 text-gray-400 border-b border-gray-800 uppercase text-[10px] tracking-wider">
+                  <th class="py-3 px-3">№</th>
+                  <th class="py-3 px-3">Наименование товара</th>
+                  <th class="py-3 px-3">Ед.</th>
+                  <th class="py-3 px-3 text-right">Кол-во</th>
+                  <th class="py-3 px-3 text-right">Цена, ₸</th>
+                  <th class="py-3 px-3 text-right">Сумма, ₸</th>
+                  <th class="py-3 px-3 text-center">Статус ИИ</th>
+                </tr>
+              </thead>
+              <tbody id="ocr-table-body" class="divide-y divide-gray-800/60 text-gray-200">
+                <!-- Dynamically Populated -->
+              </tbody>
+              <tfoot>
+                <tr class="bg-gray-900/90 font-bold text-white border-t-2 border-gray-700">
+                  <td colspan="5" class="py-3 px-3 uppercase text-right">ИТОГО К ОПЛАТЕ:</td>
+                  <td id="ocr-total-sum" class="py-3 px-3 text-right text-emerald-400 text-sm">379 900 ₸</td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+            <p id="ocr-footer-note" class="text-[11px] text-gray-400 italic mt-2 text-right">
+              Всего отпущено наименований: 7, на сумму 379 900 ₸
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: DEBTS & WHATSAPP REMINDER GENERATOR -->
+    <div id="view-debts" class="hidden space-y-6">
+      <div class="glass-card p-6 rounded-2xl border border-gray-800">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i data-lucide="users" class="w-6 h-6 text-emerald-400"></i>
+              Управление задолженностью и расчетами
+            </h2>
+            <p class="text-xs text-gray-400">Контроль долгов клиентов и автоматические вежливые напоминания</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Debtor List Table -->
+          <div class="lg:col-span-7 space-y-3">
+            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Список контрагентов</h3>
+
+            <div id="debtors-list-container" class="space-y-3">
+              <!-- Dynamically Populated via JS -->
+            </div>
+          </div>
+
+          <!-- WhatsApp Reminder Generator Box -->
+          <div class="lg:col-span-5 glass-card p-5 rounded-xl border border-gray-800 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <i data-lucide="message-square" class="w-4 h-4 text-emerald-400"></i>
+                  Генератор сообщений WhatsApp
+                </h3>
+                <div class="flex gap-1 bg-gray-900 p-1 rounded-lg text-[11px]">
+                  <button id="lang-ru" onclick="setLang('ru')" class="px-2 py-0.5 rounded bg-emerald-500 text-black font-bold">RU</button>
+                  <button id="lang-kk" onclick="setLang('kk')" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">KZ</button>
+                </div>
+              </div>
+
+              <div class="space-y-2 mb-3 text-xs">
+                <p class="text-gray-400">Выбран контрагент: <span id="debtor-name" class="font-bold text-white">ИП «Ахметов»</span></p>
+                <p class="text-gray-400">Сумма: <span id="debtor-amount" class="font-bold text-emerald-400">85 000 ₸</span> (<span id="debtor-days" class="text-rose-400">18 дней просрочки</span>)</p>
+              </div>
+
+              <!-- Text Area Preview -->
+              <div class="relative">
+                <textarea id="whatsapp-text" rows="6" class="w-full p-3 rounded-xl bg-gray-900 border border-gray-700 text-xs text-gray-200 focus:outline-none focus:border-emerald-500 resize-none font-sans" readonly></textarea>
+              </div>
+            </div>
+
+            <div class="mt-4 flex gap-2">
+              <button onclick="copyReminder()" class="flex-1 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-semibold text-xs transition-all flex items-center justify-center gap-2">
+                <i data-lucide="copy" class="w-4 h-4"></i> Скопировать
+              </button>
+              <button onclick="sendWhatsApp()" class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
+                <i data-lucide="send" class="w-4 h-4"></i> Отправить в WA
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: ARCHITECTURE & HOW IT WORKS -->
+    <div id="view-arch" class="hidden space-y-6">
+      <div class="glass-card p-6 rounded-2xl border border-gray-800">
+        <div class="text-center max-w-2xl mx-auto mb-8">
+          <h2 class="text-2xl font-black text-white">Архитектура BAQYLA</h2>
+          <p class="text-xs text-emerald-400 font-semibold uppercase tracking-widest mt-1">«Код считает, ИИ объясняет»</p>
+          <p class="text-xs text-gray-400 mt-2">
+            Точные финансовые расчёты отделены от нейросети. ИИ получает готовые цифры и не придумывает данные.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
+          <!-- Step 1 -->
+          <div class="glass-card p-5 rounded-2xl border border-gray-800 text-center space-y-2 relative">
+            <div class="w-10 h-10 mx-auto rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold">01</div>
+            <h4 class="text-sm font-bold text-white">Данные</h4>
+            <p class="text-xs text-gray-400">CSV, Excel, выписки банков, фото бумажных накладных приводятся к единому виду.</p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="glass-card p-5 rounded-2xl border border-emerald-500/30 text-center space-y-2 relative">
+            <div class="w-10 h-10 mx-auto rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">02</div>
+            <h4 class="text-sm font-bold text-white">Расчёты (Python)</h4>
+            <p class="text-xs text-gray-400">Pandas считает маржу, ABC-анализ, кассовые разрывы и остатки без галлюцинаций.</p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="glass-card p-5 rounded-2xl border border-teal-500/30 text-center space-y-2 relative">
+            <div class="w-10 h-10 mx-auto rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center font-bold">03</div>
+            <h4 class="text-sm font-bold text-white">ИИ Интеллект</h4>
+            <p class="text-xs text-gray-400">Переводит цифры на простой язык, дает конкретный шаг и генерирует тексты.</p>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="glass-card p-5 rounded-2xl border border-purple-500/30 text-center space-y-2 relative">
+            <div class="w-10 h-10 mx-auto rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold">04</div>
+            <h4 class="text-sm font-bold text-white">Telegram & Web</h4>
+            <p class="text-xs text-gray-400">Владелец получает 1 действие на сегодня в привычном мессенджере.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INTERACTIVE TELEGRAM SIMULATOR WIDGET -->
+    <section class="glass-card p-6 rounded-3xl border border-emerald-500/20 bg-gradient-to-b from-gray-900 to-gray-950">
+      <div class="max-w-3xl mx-auto space-y-4">
+        <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-emerald-500 flex items-center justify-center text-black font-extrabold text-sm">
+              <i data-lucide="bot" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-white">Интерактивный симулятор Telegram-бота</h3>
+              <p class="text-[11px] text-emerald-400 flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> @BaqylaAiBot онлайн
+              </p>
+            </div>
+          </div>
+          <span class="text-[10px] text-gray-500">Симуляция ответа ИИ</span>
+        </div>
+
+        <!-- Chat Output Window -->
+        <div id="chat-window" class="h-64 overflow-y-auto space-y-3 p-3 bg-gray-950/80 rounded-2xl border border-gray-800/80 text-xs">
+          <!-- Bot Welcome Message -->
+          <div class="flex items-start gap-2.5">
+            <div class="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 text-[10px] font-bold">ИИ</div>
+            <div id="bot-welcome-msg" class="bg-gray-900 p-3 rounded-2xl rounded-tl-none border border-gray-800 max-w-[85%] text-gray-200">
+              Сәлеметсіз бе! Я ваш ИИ-финдиректор BAQYLA. Выберите вопрос ниже или напишите свой:
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Question Prompts -->
+        <div id="chat-prompts" class="flex flex-wrap gap-2 pt-1">
+          <!-- Dynamically inserted prompts -->
+        </div>
+
+        <!-- Input Bar -->
+        <form onsubmit="handleChatSubmit(event)" class="flex gap-2">
+          <input id="chat-input" type="text" placeholder="Задайте вопрос по финансам вашего бизнеса..." class="flex-1 px-4 py-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
+          <button type="submit" class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition-all flex items-center justify-center">
+            <i data-lucide="send" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-gray-800/80 bg-gray-950 py-6 mt-12 text-xs text-gray-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-white">BAQYLA AI</span>
+        <span>— Превращаем данные в решения для МСБ</span>
+      </div>
+      <p>© 2026 BAQYLA Team. Разработано для малого бизнеса Жамбылской области (г. Тараз).</p>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT LOGIC WITH BUSINESS TYPE SCENARIOS -->
+  <script>
+    // INITIALIZATION & BUSINESS TYPES DATA MODEL
+    let currentBizType = 'market';
+    let chartInstance = null;
+    let currentLang = 'ru';
+
+    const businessScenarios = {
+      market: {
+        tag: 'Мини-маркет «Береке»',
+        title: 'Мини-маркет «Береке»',
+        desc: 'ИИ-финдиректор контролирует списания просрочки, маржу розничных товаров и кассовые разрывы перед оптовыми поставщиками Тараза.',
+        frozenVal: '765 738 ₸',
+        frozenSub: 'Залежался товар (14-28 дней)',
+        frozenDesc: 'Вложены деньги в позиции без динамики продаж (Кефир, консервы).',
+        lossVal: '481 018 ₸',
+        lossSub: 'Отрицательная маржа',
+        lossDesc: 'Товары продаются ниже себестоимости (Куриное филе).',
+        invVal: '379 900 ₸',
+        invSub: 'Накладная № 4871',
+        invDesc: 'ТОО «Оптовая база №7» (Молоко, Хлеб, Овощи).',
+        gapVal: 'Через 12 дней',
+        gapSub: 'Нехватка ~240 000 ₸',
+        gapDesc: 'Прогноз выплаты зарплаты и расчетов с дистрибьюторами.',
+        chartTitle: 'Анализ товарных запасов и маржи продуктов',
+        chartSub: 'Оценка оборачиваемости и маржинальности розничных позиций',
+        chartLabels: ['Молоко 2.5%', 'Хлеб Нарезной', 'Картофель', 'Куриное филе', 'Кефир 1%', 'Помидоры', 'Лук'],
+        chartData: [84000, 42000, 47500, -15000, 30400, 26000, 12000],
+        chartColors: ['#10b981', '#10b981', '#10b981', '#ef4444', '#f59e0b', '#10b981', '#10b981'],
+        aiMainRec: 'Пересмотреть цену на <span class="font-bold text-emerald-400">«Куриное филе 1 кг»</span> (поднять с 2300 ₸ до 2550 ₸) и заморозить закупку <span class="font-bold text-amber-400">«Кефир 1%»</span>.',
+        tasks: [
+          '<strong>Поднять цену Куриного филе</strong> с 2300 ₸ до 2550 ₸ для выхода из убытка.',
+          '<strong>Напомнить ИП «Ахметов»</strong> о долге 85 000 ₸ (просрочка 18 дней).',
+          '<strong>Заморозить заказ кефира</strong> — запаса хватит ещё на 24 дня.'
+        ],
+        ocrNo: '4871 от 17.10.2026',
+        ocrSupplier: 'ТОО «Оптовая база №7» (г. Тараз)',
+        ocrReceiver: 'Мини-маркет «Береке» (г. Тараз)',
+        ocrContract: 'Договор поставки № 15 от 01.03.2026',
+        ocrRows: [
+          { no: 1, name: 'Молоко 2,5% 1 л', unit: 'шт', qty: 200, price: 420, total: '84 000', status: 'Распознано', statusCls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+          { no: 2, name: 'Хлеб «Нарезной» 500 г', unit: 'шт', qty: 300, price: 140, total: '42 000', status: 'Распознано', statusCls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+          { no: 3, name: 'Картофель 1 кг', unit: 'кг', qty: 250, price: 190, total: '47 500', status: 'Распознано', statusCls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+          { no: 4, name: 'Куриное филе 1 кг', unit: 'кг', qty: 60, price: 2300, total: '138 000', status: 'Низкая маржа', statusCls: 'bg-rose-500/20 text-rose-300 border-rose-500/30', alertRow: true },
+          { no: 5, name: 'Кефир 1% 0,9 л', unit: 'шт', qty: 80, price: 380, total: '30 400', status: 'Избыток', statusCls: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+          { no: 6, name: 'Помидоры 1 кг', unit: 'кг', qty: 40, price: 650, total: '26 000', status: 'Распознано', statusCls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+          { no: 7, name: 'Лук репчатый 1 кг', unit: 'кг', qty: 100, price: 120, total: '12 000', status: 'Распознано', statusCls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' }
+        ],
+        ocrTotal: '379 900 ₸',
+        debtors: [
+          { name: 'ИП «Ахметов»', type: 'Высокий риск', riskCls: 'bg-rose-500/20 text-rose-300 border-rose-500/30', days: '18 дней', phone: '+7 705 123 4567', amount: '85 000 ₸' },
+          { name: 'Кафе «Шапагат»', type: 'Средний риск', riskCls: 'bg-amber-500/20 text-amber-300 border-amber-500/30', days: '9 дней', phone: '+7 701 987 6543', amount: '142 000 ₸' },
+          { name: 'Столовая «КазФосфат»', type: 'Низкий риск', riskCls: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30', days: '3 дня', phone: '+7 777 444 3322', amount: '65 000 ₸' }
+        ],
+        prompts: [
+          'Покажи кассовый разрыв',
+          'Какой товар убыточен?',
+          'Залежавшиеся остатки'
+        ]
+      },
+
+      cafe: {
+        tag: 'Ресторан & Кафе «Тараз Тағамдары»',
+        title: 'Ресторан & Кафе «Тараз Тағамдары»',
+        desc: 'Контроль себестоимости блюд (фудкост), списываемых продуктов, банкетов в долг и закупок у мясников.',
+        frozenVal: '430 000 ₸',
+        frozenSub: 'Избыток замороженного мяса',
+        frozenDesc: 'Закуплено говядины больше спроса на буднях.',
+        lossVal: '215 000 ₸',
+        lossSub: 'Списания заготовок',
+        lossDesc: 'Ингредиенты с истекающим сроком годности.',
+        invVal: '520 000 ₸',
+        invSub: 'Закупка № 102',
+        invDesc: 'Мясной цех «Мясокомбинат Тараз» (Мясо, специи).',
+        gapVal: 'Через 5 дней',
+        gapSub: 'Нехватка ~310 000 ₸',
+        gapDesc: 'Расчет за аренду зала и с мясным поставщиком.',
+        chartTitle: 'Фудкост и маржинальность популярных блюд',
+        chartSub: 'Прибыльность позиций меню в сравнении с затратами на сырье',
+        chartLabels: ['Бешбармак', 'Лагман', 'Шашлычная тарелка', 'Стейк Рибай', 'Салат Цезарь', 'Чайный сет'],
+        chartData: [120000, 65000, 180000, -22000, 45000, 85000],
+        chartColors: ['#10b981', '#10b981', '#10b981', '#ef4444', '#10b981', '#10b981'],
+        aiMainRec: 'Поднять фудкост-маржу на <span class="font-bold text-rose-400">«Стейк Рибай»</span> (увеличить порционную цену на 12%) и собрать аванс с спец-банкета.',
+        tasks: [
+          '<strong>Скорректировать цену Стейка</strong> из-за роста закупочной цены говядины.',
+          '<strong>Затребовать 50% предоплату</strong> с Банкета ИП «Оспанов» (350 000 ₸).',
+          '<strong>Уменьшить закуп овощей</strong> на 15% до пятничных банкетов.'
+        ],
+        ocrNo: '102 от 19.10.2026',
+        ocrSupplier: 'ИП «Тараз-Мясо-Опт»',
+        ocrReceiver: 'Кафе «Тараз Тағамдары»',
+        ocrContract: 'Разовый договор закупа № 88',
+        ocrRows: [
+          { no: 1, name: 'Вырезка говяжья мякоть', unit: 'кг', qty: 80, price: 3400, total: '272 000', status: 'Распознано', statusCls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+          { no: 2, name: 'Баранина (ребра)', unit: 'кг', qty: 50, price: 3100, total: '155 000', status: 'Распознано', statusCls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+          { no: 3, name: 'Масло растительное 5л', unit: 'шт', qty: 15, price: 4200, total: '63 000', status: 'Распознано', statusCls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+          { no: 4, name: 'Специи восточные микс', unit: 'кг', qty: 5, price: 6000, total: '30 000', status: 'Дорого', statusCls: 'bg-rose-500/20 text-rose-300 border-rose-500/30', alertRow: true }
+        ],
+        ocrTotal: '520 000 ₸',
+        debtors: [
+          { name: 'ИП «Оспанов» (Банкет)', type: 'Высокий риск', riskCls: 'bg-rose-500/20 text-rose-300 border-rose-500/30', days: '12 дней', phone: '+7 702 333 2211', amount: '350 000 ₸' },
+          { name: 'ТОО «Жамбыл-Строй» (Обеды)', type: 'Средний риск', riskCls: 'bg-amber-500/20 text-amber-300 border-amber-500/30', days: '6 дней', phone: '+7 707 555 6677', amount: '180 000 ₸' }
+        ],
+        prompts: [
+          'Как снизить фудкост?',
+          'Прогноз кассового разрыва',
+          'Долги за банкеты'
+        ]
+      },
+
+      factory: {
+        tag: 'Швейный Цех «Тараз Текстиль»',
+        title: 'Швейный Цех «Тараз Текстиль»',
+        desc: 'Аналитика закупки рулонов ткани, фурнитуры, выполнения оптовых госзаказов и задолженностей байеров.',
+        frozenVal: '1 850 000 ₸',
+        frozenSub: 'Ткань неходовых цветов',
+        frozenDesc: 'Замороженный сырьевой капитал на складе.',
+        lossVal: '320 000 ₸',
+        lossSub: 'Брак и перерасход нитей',
+        lossDesc: 'Отклонение от нормы расхода на партию.',
+        invVal: '1 240 000 ₸',
+        invSub: 'Накладная № 882',
+        invDesc: 'ТОО «Алматы Текстиль Опт» (Хлопок, молнии).',
+        gapVal: 'Через 8 дней',
+        gapSub: 'Нехватка ~680 000 ₸',
+        gapDesc: 'Оплата за электроэнергию цеха и зарплата швей.',
+        chartTitle: 'Маржинальность по видам швейной продукции',
+        chartSub: 'Валовая прибыль с учетом стоимости сырья и работы',
+        chartLabels: ['Спецодежда', 'Школьная форма', 'Постельное белье', 'Куртки утепленные', 'Футболки опт'],
+        chartData: [450000, 620000, -85000, 310000, 180000],
+        chartColors: ['#10b981', '#10b981', '#ef4444', '#10b981', '#10b981'],
+        aiMainRec: 'Пересчитать калькуляцию на <span class="font-bold text-rose-400">«Постельное белье»</span> (удорожание ткани на 18%) и истребовать долг у оптовика.',
+        tasks: [
+          '<strong>Поднять оптовую цену</strong> комплект постельного белья с 6500 ₸ до 7800 ₸.',
+          '<strong>Запросить оплату у ТОО «Закуп-Школа»</strong> за отгруженную форму (820 000 ₸).',
+          '<strong>Пустить рулоны ткани синего цвета</strong> в раскрой спецодежды.'
+        ],
+        ocrNo: '882 от 15.10.2026',
+        ocrSupplier: 'ТОО «Алматы Текстиль Опт»',
+        ocrReceiver: 'Цех «Тараз Текстиль»',
+        ocrContract: 'Договор поставки сырья № 401',
+        ocrRows: [
+          { no: 1, name: 'Ткань Хлопок 100% (рулон)', unit: 'рул', qty: 20, price: 45000, total: '900 000', status: 'Распознано', statusCls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+          { no: 2, name: 'Нитки армированные 5000м', unit: 'шт', qty: 50, price: 1800, total: '90 000', status: 'Распознано', statusCls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+          { no: 3, name: 'Молния трактор 60см', unit: 'шт', qty: 1000, price: 250, total: '250 000', status: 'Распознано', statusCls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' }
+        ],
+        ocrTotal: '1 240 000 ₸',
+        debtors: [
+          { name: 'ТОО «Закуп-Школа»', type: 'Высокий риск', riskCls: 'bg-rose-500/20 text-rose-300 border-rose-500/30', days: '24 дня', phone: '+7 701 444 8899', amount: '820 000 ₸' },
+          { name: 'ИП «Сауда-Маркет»', type: 'Средний риск', riskCls: 'bg-amber-500/20 text-amber-300 border-amber-500/30', days: '11 дней', phone: '+7 705 666 1122', amount: '340 000 ₸' }
+        ],
+        prompts: [
+          'Где кассовый разрыв?',
+          'Маржа спецодежды',
+          'Долги оптовиков'
+        ]
+      },
+
+      clothing: {
+        tag: 'Магазин одежды «Fashion Taraz»',
+        title: 'Магазин одежды «Fashion Taraz»',
+        desc: 'Анализ залежавшихся прошлых коллекций, неходовых размеров, маржи брендовых поставок и рассрочек клиентов.',
+        frozenVal: '1 120 000 ₸',
+        frozenSub: 'Прошлая коллекция (осень)',
+        frozenDesc: 'Товар лежит на складе более 45 дней.',
+        lossVal: '190 000 ₸',
+        lossSub: 'Чрезмерные скидки',
+        lossDesc: 'Продажи ниже закупной цены Турция/Китай.',
+        invVal: '890 000 ₸',
+        invSub: 'Инвойс № 551',
+        invDesc: 'ИП «Карго-Турция-Тараз» (Куртки, обувь).',
+        gapVal: 'Через 15 дней',
+        gapSub: 'Нехватка ~180 000 ₸',
+        gapDesc: 'Аренда бутика в ТРЦ «Mart Taraz».',
+        chartTitle: 'Оборачиваемость и маржинальность категорий одежды',
+        chartSub: 'Соотношение приносимой выручки к остаткам на вешалках',
+        chartLabels: ['Верхняя одежда', 'Джинсы & Брюки', 'Обувь кожа', 'Платья вечерние', 'Аксессуары'],
+        chartData: [380000, 240000, -35000, 190000, 95000],
+        chartColors: ['#10b981', '#10b981', '#ef4444', '#10b981', '#10b981'],
+        aiMainRec: 'Запустить распродажу со скидкой 20% на <span class="font-bold text-amber-400">«Обувь кожа (неходовые размеры)»</span> для высвобождения 350 тыс ₸.',
+        tasks: [
+          '<strong>Запустить акцию на остатки обуви</strong> чтобы вернуть деньги в оборот.',
+          '<strong>Собрать платежи по рассрочкам Kaspi / Тетрадь</strong> (ИП «Садыкова» - 95 000 ₸).',
+          '<strong>Не закупать платья</strong> до завершения распродажи текущих моделей.'
+        ],
+        ocrNo: '551 от 18.10.2026',
+        ocrSupplier: 'ИП «Карго-Стамбул-Опт»',
+        ocrReceiver: 'Бутик «Fashion Taraz»',
+        ocrContract: 'Контракт поставки № 12',
+        ocrRows: [
+          { no: 1, name: 'Куртки демисезонные (Турция)', unit: 'шт', qty: 30, price: 18000, total: '540 000', status: 'Распознано', statusCls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+          { no: 2, name: 'Джинсы классика', unit: 'шт', qty: 40, price: 6200, total: '248 000', status: 'Распознано', statusCls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+          { no: 3, name: 'Обувь кожа (микс размеров)', unit: 'пар', qty: 10, price: 10200, total: '102 000', status: 'Риск зависания', statusCls: 'bg-amber-500/20 text-amber-300 border-amber-500/30', alertRow: true }
+        ],
+        ocrTotal: '890 000 ₸',
+        debtors: [
+          { name: 'ИП «Садыкова» (Рассрочка)', type: 'Высокий риск', riskCls: 'bg-rose-500/20 text-rose-300 border-rose-500/30', days: '30 дней', phone: '+7 775 888 9911', amount: '95 000 ₸' },
+          { name: 'Клиент «Асель»', type: 'Средний риск', riskCls: 'bg-amber-500/20 text-amber-300 border-amber-500/30', days: '14 дней', phone: '+7 701 222 3344', amount: '45 000 ₸' }
+        ],
+        prompts: [
+          'Как высвободить деньги?',
+          'Сроки кассового разрыва',
+          'Залежавшаяся одежда'
+        ]
+      }
+    };
+
+    // ONBOARDING MODAL FUNCTIONS
+    function openOnboardingModal() {
+      document.getElementById('onboarding-modal').classList.remove('hidden');
+    }
+
+    function selectBusinessType(type) {
+      if (!businessScenarios[type]) return;
+      currentBizType = type;
+
+      // Hide Onboarding Modal
+      document.getElementById('onboarding-modal').classList.add('hidden');
+
+      // Update Header Switcher Buttons Styling
+      ['market', 'cafe', 'factory', 'clothing'].forEach(t => {
+        const btn = document.getElementById(`biz-btn-${t}`);
+        if (btn) {
+          if (t === type) {
+            btn.className = 'px-3 py-1.5 rounded-xl font-medium transition-all text-white bg-emerald-500/20 border border-emerald-500/40 shadow-sm';
+          } else {
+            btn.className = 'px-3 py-1.5 rounded-xl font-medium text-gray-400 hover:text-white transition-all';
+          }
+        }
+      });
+
+      // Apply Scenario Data to Elements
+      const data = businessScenarios[type];
+
+      // Hero Elements
+      document.getElementById('hero-biz-tag').innerText = data.tag;
+      document.getElementById('hero-biz-desc').innerText = data.desc;
+      document.getElementById('hero-scenario-title').innerText = data.title;
+      document.getElementById('hero-scenario-sub').innerText = `${data.frozenVal} в остатках`;
+
+      // 4 Metric Cards
+      document.getElementById('card-frozen-val').innerText = data.frozenVal;
+      document.getElementById('card-frozen-sub').innerHTML = `<i data-lucide="clock" class="w-3 h-3"></i> ${data.frozenSub}`;
+      document.getElementById('card-frozen-desc').innerText = data.frozenDesc;
+
+      document.getElementById('card-loss-val').innerText = data.lossVal;
+      document.getElementById('card-loss-sub').innerHTML = `<i data-lucide="alert-triangle" class="w-3 h-3"></i> ${data.lossSub}`;
+      document.getElementById('card-loss-desc').innerText = data.lossDesc;
+
+      document.getElementById('card-inv-val').innerText = data.invVal;
+      document.getElementById('card-inv-sub').innerHTML = `<i data-lucide="check-circle-2" class="w-3 h-3"></i> ${data.invSub}`;
+      document.getElementById('card-inv-desc').innerText = data.invDesc;
+
+      document.getElementById('card-gap-val').innerText = data.gapVal;
+      document.getElementById('card-gap-sub').innerHTML = `<i data-lucide="info" class="w-3 h-3"></i> ${data.gapSub}`;
+      document.getElementById('card-gap-desc').innerText = data.gapDesc;
+
+      // AI Recommendation
+      document.getElementById('ai-main-rec').innerHTML = data.aiMainRec;
+
+      // AI Task List
+      const taskList = document.getElementById('ai-tasks-list');
+      taskList.innerHTML = '';
+      data.tasks.forEach(tText => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start gap-2.5 bg-gray-900/60 p-2.5 rounded-xl border border-gray-800';
+        li.innerHTML = `
+          <i data-lucide="arrow-up-right" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+          <span>${tText}</span>
+        `;
+        taskList.appendChild(li);
+      });
+
+      // Update Chart
+      document.getElementById('chart-title').innerHTML = `<i data-lucide="bar-chart-3" class="w-5 h-5 text-emerald-400"></i> ${data.chartTitle}`;
+      document.getElementById('chart-sub').innerText = data.chartSub;
+      renderChart(data);
+
+      // OCR Table Section
+      document.getElementById('ocr-doc-no').innerText = data.ocrNo;
+      document.getElementById('ocr-supplier').innerText = data.ocrSupplier;
+      document.getElementById('ocr-receiver').innerText = data.ocrReceiver;
+      document.getElementById('ocr-contract').innerText = data.ocrContract;
+      document.getElementById('ocr-total-sum').innerText = data.ocrTotal;
+      document.getElementById('ocr-footer-note').innerText = `Всего отпущено наименований: ${data.ocrRows.length}, на сумму ${data.ocrTotal}`;
+
+      const tbody = document.getElementById('ocr-table-body');
+      tbody.innerHTML = '';
+      data.ocrRows.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.className = `hover:bg-gray-800/30 ${row.alertRow ? 'bg-rose-500/5' : ''}`;
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 text-gray-400">${row.no}</td>
+          <td class="py-2.5 px-3 font-medium ${row.alertRow ? 'text-rose-300 font-bold' : ''}">${row.name}</td>
+          <td class="py-2.5 px-3 text-gray-400">${row.unit}</td>
+          <td class="py-2.5 px-3 text-right">${row.qty}</td>
+          <td class="py-2.5 px-3 text-right">${row.price}</td>
+          <td class="py-2.5 px-3 text-right font-semibold">${row.total}</td>
+          <td class="py-2.5 px-3 text-center">
+            <span class="px-2 py-0.5 rounded text-[10px] ${row.statusCls}">${row.status}</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Debtors Section
+      const debtorsContainer = document.getElementById('debtors-list-container');
+      debtorsContainer.innerHTML = '';
+      data.debtors.forEach((d, idx) => {
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-xl bg-gray-900/80 border ${idx === 0 ? 'border-rose-500/30' : 'border-gray-800'} hover:border-emerald-500 cursor-pointer transition-all flex items-center justify-between`;
+        card.onclick = () => selectDebtor(d.name, d.amount, d.days, d.phone);
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-white text-sm">${d.name}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] ${d.riskCls}">${d.type}</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">Просрочка: <span class="text-amber-400 font-semibold">${d.days}</span> • Тел: ${d.phone}</p>
+          </div>
+          <div class="text-right">
+            <span class="text-base font-extrabold text-white">${d.amount}</span>
+            <p class="text-[10px] text-emerald-400 mt-0.5">Выбрать &rarr;</p>
+          </div>
+        `;
+        debtorsContainer.appendChild(card);
+      });
+
+      // Select first debtor default
+      if (data.debtors.length > 0) {
+        selectDebtor(data.debtors[0].name, data.debtors[0].amount, data.debtors[0].days, data.debtors[0].phone);
+      }
+
+      // Telegram Simulator Prompts & Welcome message
+      document.getElementById('bot-welcome-msg').innerText = `Сәлеметсіз бе! Я ваш ИИ-финдиректор BAQYLA для "${data.title}". Нажмите на интересующий вопрос или напишите свой:`;
+
+      const promptsContainer = document.getElementById('chat-prompts');
+      promptsContainer.innerHTML = '';
+      data.prompts.forEach(promptText => {
+        const btn = document.createElement('button');
+        btn.className = 'px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-emerald-500/20 hover:text-emerald-300 text-gray-300 text-xs border border-gray-700 transition-all';
+        btn.onclick = () => sendSimulatedQuery(promptText);
+        btn.innerText = `💡 ${promptText}`;
+        promptsContainer.appendChild(btn);
+      });
+
+      // Re-create icons
+      lucide.createIcons();
+    }
+
+    // CHART RENDER FUNCTION
+    function renderChart(scenario) {
+      const ctx = document.getElementById('financialChart').getContext('2d');
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: scenario.chartLabels,
+          datasets: [
+            {
+              label: 'Выручка / Наценка / Маржа (₸)',
+              data: scenario.chartData,
+              backgroundColor: scenario.chartColors,
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let val = context.raw;
+                  return val < 0 ? ` Убыток/Отклонение: ${val} ₸` : ` Маржа/Остаток: ${val} ₸`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#9ca3af', font: { size: 10 } },
+              grid: { color: 'rgba(255, 255, 255, 0.05)' }
+            },
+            y: {
+              ticks: { color: '#9ca3af', font: { size: 10 } },
+              grid: { color: 'rgba(255, 255, 255, 0.05)' }
+            }
+          }
+        }
+      });
+    }
+
+    // TAB SWITCHING LOGIC
+    function switchTab(tabId) {
+      const views = ['dashboard', 'ocr', 'debts', 'arch'];
+      views.forEach(v => {
+        const viewEl = document.getElementById(`view-${v}`);
+        const tabBtn = document.getElementById(`tab-${v}`);
+        if (v === tabId) {
+          viewEl.classList.remove('hidden');
+          if (tabBtn) {
+            tabBtn.classList.add('text-emerald-400', 'bg-emerald-500/10');
+            tabBtn.classList.remove('text-gray-400');
+          }
+        } else {
+          viewEl.classList.add('hidden');
+          if (tabBtn) {
+            tabBtn.classList.remove('text-emerald-400', 'bg-emerald-500/10');
+            tabBtn.classList.add('text-gray-400');
+          }
+        }
+      });
+    }
+
+    // DEBTOR & WHATSAPP LOGIC
+    let selectedDebtor = { name: '', amount: '', days: '', phone: '' };
+
+    function selectDebtor(name, amount, days, phone) {
+      selectedDebtor = { name, amount, days, phone };
+      document.getElementById('debtor-name').innerText = name;
+      document.getElementById('debtor-amount').innerText = amount;
+      document.getElementById('debtor-days').innerText = `${days} просрочки`;
+      updateReminderText();
+    }
+
+    function setLang(lang) {
+      currentLang = lang;
+      document.getElementById('lang-ru').className = lang === 'ru' ? 'px-2 py-0.5 rounded bg-emerald-500 text-black font-bold' : 'px-2 py-0.5 rounded text-gray-400 hover:text-white';
+      document.getElementById('lang-kk').className = lang === 'kk' ? 'px-2 py-0.5 rounded bg-emerald-500 text-black font-bold' : 'px-2 py-0.5 rounded text-gray-400 hover:text-white';
+      updateReminderText();
+    }
+
+    function updateReminderText() {
+      const textarea = document.getElementById('whatsapp-text');
+      if (currentLang === 'ru') {
+        textarea.value = `Здравствуйте, ${selectedDebtor.name}!\n\nНапоминаем вам об остатке оплаты по накладной на сумму ${selectedDebtor.amount}. Просрочка составляет ${selectedDebtor.days}.\n\nБудем благодарны, если сможете произвести расчет в ближайшее время. Спасибо за сотрудничество!`;
+      } else {
+        textarea.value = `Сәлеметсіз бе, ${selectedDebtor.name}!\n\n${selectedDebtor.amount} сомасындағы жүкқұжат бойынша төлемді есіңізге саламыз. Мерзімі ${selectedDebtor.days} өтіп кетті.\n\nЖақын арада есеп айырысуды сұраймыз. Ынтымақтастығыңызға рақмет!`;
+      }
+    }
+
+    function copyReminder() {
+      const text = document.getElementById('whatsapp-text').value;
+      const el = document.createElement('textarea');
+      el.value = text;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      alert('Текст напоминания скопирован!');
+    }
+
+    function sendWhatsApp() {
+      const text = encodeURIComponent(document.getElementById('whatsapp-text').value);
+      const cleanPhone = selectedDebtor.phone.replace(/[^0-9]/g, '');
+      window.open(`https://wa.me/${cleanPhone}?text=${text}`, '_blank');
+    }
+
+    // TELEGRAM SIMULATOR LOGIC
+    function sendSimulatedQuery(query) {
+      appendChatMessage('user', query);
+      setTimeout(() => {
+        const scenario = businessScenarios[currentBizType];
+        let botReply = `Анализ по запросу "${query}":\nПо сфере ${scenario.title}: ${scenario.aiMainRec.replace(/<[^>]*>?/gm, '')}. Кассовый разрыв ожидает ${scenario.gapVal}.`;
+        
+        if (query.includes('кассовый разрыв') || query.includes('разрыв')) {
+          botReply = `⚠️ **Прогноз кассового разрыва:**\n${scenario.gapVal} ожидает нехватка ${scenario.gapSub}.\n\n💡 **Причина:** ${scenario.gapDesc}\n\n👉 **Рекомендация ИИ:** Срочно истребуйте долги у клиентов (${scenario.debtors[0]?.name || 'Контрагенты'}).`;
+        } else if (query.includes('убыточен') || query.includes('фудкост') || query.includes('маржа')) {
+          botReply = `❌ **Убыточная / низкомаржинальная позиция:**\nПотери составляют ${scenario.lossVal}.\n\n💡 **Причина:** ${scenario.lossDesc}\n\n👉 **Действие:** ${scenario.tasks[0].replace(/<[^>]*>?/gm, '')}`;
+        } else if (query.includes('остатки') || query.includes('высвободить') || query.includes('одежда')) {
+          botReply = `📦 **Замороженный капитал в остатках:**\nСумма: ${scenario.frozenVal}.\n\n💡 ${scenario.frozenDesc}\n\n👉 **Действие:** Приостановить повторный закуп и запустить спец-акцию.`;
+        }
+
+        appendChatMessage('bot', botReply);
+      }, 500);
+    }
+
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+      sendSimulatedQuery(text);
+      input.value = '';
+    }
+
+    function appendChatMessage(sender, text) {
+      const chatWindow = document.getElementById('chat-window');
+      const msgDiv = document.createElement('div');
+      
+      if (sender === 'user') {
+        msgDiv.className = 'flex items-start gap-2.5 justify-end';
+        msgDiv.innerHTML = `
+          <div class="bg-emerald-500/20 text-emerald-200 p-3 rounded-2xl rounded-tr-none border border-emerald-500/30 max-w-[85%]">
+            ${text}
+          </div>
+          <div class="w-7 h-7 rounded-full bg-emerald-500 text-black flex items-center justify-center shrink-0 text-[10px] font-bold">Вы</div>
+        `;
+      } else {
+        msgDiv.className = 'flex items-start gap-2.5';
+        msgDiv.innerHTML = `
+          <div class="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 text-[10px] font-bold">ИИ</div>
+          <div class="bg-gray-900 p-3 rounded-2xl rounded-tl-none border border-gray-800 max-w-[85%] text-gray-200 whitespace-pre-line">
+            ${text}
+          </div>
+        `;
+      }
+      chatWindow.appendChild(msgDiv);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // ON LOAD
+    window.addEventListener('DOMContentLoaded', () => {
+      // Load Mini-market as default initial scenario
+      selectBusinessType('market');
+    });
+  </script>
+</body>
+</html>
